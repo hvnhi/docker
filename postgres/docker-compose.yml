@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  postgres:
+    container_name: vntech_postgres
+    image: "postgres:12"
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=vntech,vntech_bk
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    networks:
+      - inetwork
+    restart: always
+
+  pgadmin:
+    container_name: vntech_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: vntech0912@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: hvnhi@0912
+    volumes:
+      - ./pgadmin:/root/.pgadmin
+    ports:
+      - 127.0.0.1:9092:80
+    restart: always
+    networks:
+      - inetwork
+    depends_on:
+      - postgres
+    links:
+      - postgres
+
+networks:
+  inetwork:
+    external:
+      name: inetwork
+
+volumes:
+  pgdata:
